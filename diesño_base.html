@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EnglishMaster - Aprende inglés de forma interactiva</title>
+  
+  <!-- TailwindCSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style id="app-style">
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f8fafc;
+    }
+    
+    .section-card {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .section-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+    
+    .progress-bar {
+      height: 8px;
+      border-radius: 4px;
+      background-color: #e2e8f0;
+      overflow: hidden;
+    }
+    
+    .progress-value {
+      height: 100%;
+      border-radius: 4px;
+      background-color: #4f46e5;
+      transition: width 0.5s ease;
+    }
+    
+    .loader {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #4f46e5;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .option-btn {
+      transition: all 0.2s ease;
+    }
+    
+    .option-btn:hover {
+      transform: scale(1.02);
+    }
+    
+    .option-btn.correct {
+      background-color: #10b981 !important;
+      color: white !important;
+    }
+    
+    .option-btn.incorrect {
+      background-color: #ef4444 !important;
+      color: white !important;
+    }
+    
+    .exercise-card {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeIn 0.5s forwards;
+    }
+    
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .word-tag {
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .word-tag:hover {
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+  <div id="app" class="min-h-screen flex flex-col">
+    <!-- Header -->
+    <header class="bg-indigo-600 text-white shadow-md">
+      <div class="container mx-auto py-4 px-6 flex justify-between items-center">
+        <div class="flex items-center space-x-2">
+          <i class="fas fa-globe text-2xl text-indigo-300"></i>
+          <h1 class="text-2xl font-bold">EnglishMaster</h1>
+        </div>
+        <div id="progress-container" class="hidden md:flex items-center space-x-4">
+          <div class="text-sm">
+            <span id="progress-text">0%</span> completado
+          </div>
+          <div class="progress-bar w-32">
+            <div id="progress-value" class="progress-value" style="width: 0%"></div>
+          </div>
+          <div class="text-sm">
+            Aciertos: <span id="success-count">0</span>/<span id="total-exercises">0</span>
+          </div>
+        </div>
+      </div>
+    </header>
+    
+    <!-- Main Content -->
+    <main class="flex-1 container mx-auto p-6">
+      <!-- Main Menu View -->
+      <div id="main-menu" class="block">
+        <h2 class="text-3xl font-bold text-center text-gray-800 mb-8">Elige una sección para comenzar</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- Verbos -->
+          <div class="section-card bg-white rounded-xl shadow-lg overflow-hidden">
+            <div class="bg-indigo-500 h-2"></div>
+            <div class="p-6">
+              <div class="flex items-center mb-4">
+                <div class="bg-indigo-100 p-3 rounded-full mr-4">
+                  <i class="fas fa-running text-indigo-600 text-xl"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-800">Verbos</h3>
+              </div>
+              <p class="text-gray-600 mb-6">Aprende los verbos más comunes en inglés y cómo usarlos correctamente.</p>
+              <button onclick="loadSection('verbos')" class="w-full py-2 px-4 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition duration-300 flex items-center justify-center">
+                <span>Comenzar</span>
+                <i class="fas fa-arrow-right ml-2"></i>
+              </button>
+            </div>
+          </div>
+          
+          <!-- Phrasal Verbs -->
+          <div class="section-card bg-white rounded-xl shadow-lg overflow-hidden">
+            <div class="bg-purple-500 h-2"></div>
+            <div class="p-6">
+              <div class="flex items-center mb-4">
+                <div class="bg-purple-100 p-3 rounded-full mr-4">
+                  <i class="fas fa-puzzle-piece text-purple-600 text-xl"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-800">Phrasal Verbs</h3>
+              </div>
+              <p class="text-gray-600 mb-6">Domina los verbos compuestos en inglés, esenciales para sonar natural.</p>
+              <button onclick="loadSection('phrasal-verbs')" class="w-full py-2 px-4 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition duration-300 flex items-center justify-center">
+                <span>Comenzar</span>
+                <i class="fas fa-arrow-right ml-2"></i>
+              </button>
+            </div>
+          </div>
+          
+          <!-- Verbos Regulares e Irregulares -->
+          <div class="section-card bg-white rounded-xl shadow-lg overflow-hidden">
+            <div class="bg-blue-500 h-2"></div>
+            <div class="p-6">
+              <div class="flex items-center mb-4">
+                <div class="bg-blue-100 p-3 rounded-full mr-4">
+                  <i class="fas fa-random text-blue-600 text-xl"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-800">Verbos Regulares e Irregulares</h3>
+              </div>
+              <p class="text-gray-600 mb-6">Aprende las diferencias y cómo conjugar correctamente en pasado y participio.</p>
+              <button onclick="loadSection('regular-irregular')" class="w-full py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-300 flex items-center justify-center">
+                <span>Comenzar</span>
+                <i class="fas fa-arrow-right ml-2"></i>
+              </button>
+            </div>
+          </div>
+          
+          <!-- Tiempos Gramaticales -->
+          <div class="section-card bg-white rounded-xl shadow-lg overflow-hidden">
+            <div class="bg-teal-500 h-2"></div>
+            <div class="p-6">
+              <div class="flex items-center mb-4">
+                <div class="bg-teal-100 p-3 rounded-full mr-4">
+                  <i class="fas fa-clock text-teal-600 text-xl"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-800">Tiempos Gramaticales</h3>
+              </div>
+              <p class="text-gray-600 mb-6">Domina los diferentes tiempos verbales en inglés y cuándo usarlos.</p>
+              <button onclick="loadSection('tiempos-gramaticales')" class="w-full py-2 px-4 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition duration-300 flex items-center justify-center">
+                <span>Comenzar</span>
+                <i class="fas fa-arrow-right ml-2"></i>
+              </button>
+            </div>
+          </div>
+          
+          <!-- Imagen a Palabras -->
+          <div class="section-card bg-white rounded-xl shadow-lg overflow-hidden">
+            <div class="bg-amber-500 h-2"></div>
+            <div class="p-6">
+              <div class="flex items-center mb-4">
+                <div class="bg-amber-100 p-3 rounded-full mr-4">
+                  <i class="fas fa-image text-amber-600 text-xl"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-800">Imagen a Palabras</h3>
+              </div>
+              <p class="text-gray-600 mb-6">Sube una imagen y aprende vocabulario relacionado con ella de forma interactiva.</p>
+              <button onclick="loadSection('imagen-palabras')" class="w-full py-2 px-4 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition duration-300 flex items-center justify-center">
+                <span>Comenzar</span>
+                <i class="fas fa-arrow-right ml-2"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Section Content View (Initially Hidden) -->
+      <div id="section-content" class="hidden">
+        <div class="flex justify-between items-center mb-6">
+          <button id="back-button" onclick="showMainMenu()" class="flex items-center text-indigo-600 hover:text-indigo-800 transition">
+            <i class="fas fa-arrow-left mr-2"></i>
+            Volver al menú
+          </button>
+          <div class="flex items-center">
+            <button id="restart-button" onclick="restartSection()" class="flex items-center px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition mr-4">
+              <i class="fas fa-redo mr-2"></i>
+              Reiniciar
+            </button>
+            <div class="md:hidden flex items-center space-x-2">
+              <span id="mobile-progress" class="text-sm font-medium">0%</span>
+              <div class="progress-bar w-16">
+                <div id="mobile-progress-value" class="progress-value" style="width: 0%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div id="section-title-container" class="mb-8 text-center">
+          <h2 id="section-title" class="text-3xl font-bold text-gray-800"></h2>
+          <p id="section-description" class="text-gray-600 mt-2"></p>
+        </div>
+        
+        <!-- Loading Indicator -->
+        <div id="loading" class="text-center py-12 hidden">
+          <div class="loader"></div>
+          <p class="text-gray-600 mt-4">Cargando contenido...</p>
+        </div>
+        
+        <!-- Explanation Panel -->
+        <div id="explanation-panel" class="bg-white p-6 rounded-xl shadow-md mb-8 hidden">
+          <h3 class="text-xl font-semibold mb-4 text-gray-800">Explicación</h3>
+          <div id="explanation-content"></div>
+        </div>
+        
+        <!-- Examples Panel -->
+        <div id="examples-panel" class="bg-white p-6 rounded-xl shadow-md mb-8 hidden">
+          <h3 class="text-xl font-semibold mb-4 text-gray-800">Ejemplos</h3>
+          <div id="examples-content" class="space-y-3"></div>
+        </div>
+        
+        <!-- Exercises Container -->
+        <div id="exercises-container" class="space-y-6 hidden">
+          <div class="flex justify-between items-center mb-2">
+            <h3 class="text-xl font-semibold text-gray-800">Ejercicios</h3>
+            <div class="text-sm text-gray-600">
+              <span id="current-exercise">1</span> de <span id="total-exercises-count">5</span>
+            </div>
+          </div>
+          
+          <!-- Exercise Content -->
+          <div id="exercise-content" class="bg-white p-6 rounded-xl shadow-md exercise-card"></div>
+          
+          <!-- Navigation Buttons -->
+          <div class="flex justify-between mt-6">
+            <button id="prev-button" onclick="previousExercise()" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition flex items-center disabled:opacity-50 disabled:cursor-not-allowed">
+              <i class="fas fa-chevron-left mr-2"></i>
+              Anterior
+            </button>
+            <button id="next-button" onclick="nextExercise()" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition flex items-center disabled:opacity-50 disabled:cursor-not-allowed">
+              Siguiente
+              <i class="fas fa-chevron-right ml-2"></i>
+            </button>
+          </div>
+        </div>
+        
+        <!-- Image to Words Section (Initially Hidden) -->
+        <div id="image-words-container" class="hidden">
+          <div class="bg-white p-6 rounded-xl shadow-md">
+            <h3 class="text-xl font-semibold mb-4 text-gray-800">Sube una imagen o selecciona una de las disponibles</h3>
+            
+            <div class="mb-6">
+              <label for="image-upload" class="block text-gray-700 mb-2">Subir una imagen:</label>
+              <input type="file" id="image-upload" accept="image/*" class="block w-full text-gray-700 border border-gray-300 rounded-lg cursor-pointer bg-white p-2.5">
+              <p class="text-xs text-gray-500 mt-1">Formatos permitidos: JPG, PNG, GIF</p>
+            </div>
+            
+            <div class="mb-6">
+              <p class="block text-gray-700 mb-2">O selecciona una imagen de ejemplo:</p>
+              <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <img src="https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885_1280.jpg" alt="Paisaje" class="sample-image rounded-lg shadow-sm hover:shadow-md cursor-pointer h-32 object-cover w-full">
+                <img src="https://cdn.pixabay.com/photo/2016/11/29/05/45/astronomy-1867616_1280.jpg" alt="Espacio" class="sample-image rounded-lg shadow-sm hover:shadow-md cursor-pointer h-32 object-cover w-full">
+                <img src="https://cdn.pixabay.com/photo/2014/02/27/16/10/flowers-276014_1280.jpg" alt="Flores" class="sample-image rounded-lg shadow-sm hover:shadow-md cursor-pointer h-32 object-cover w-full">
+              </div>
+            </div>
+            
+            <button id="analyze-image-btn" class="w-full py-2 px-4 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition duration-300 flex items-center justify-center">
+              <i class="fas fa-search mr-2"></i>
+              <span>Analizar imagen</span>
+            </button>
+          </div>
+          
+          <!-- Image Analysis Results (Initially Hidden) -->
+          <div id="image-results" class="mt-8 hidden">
+            <div class="flex flex-col md:flex-row gap-6">
+              <div class="md:w-1/2">
+                <img id="analyzed-image" src="" alt="Imagen analizada" class="rounded-lg shadow-md w-full">
+              </div>
+              <div class="md:w-1/2 bg-white p-6 rounded-xl shadow-md">
+                <h3 class="text-xl font-semibold mb-4 text-gray-800">Palabras detectadas</h3>
+                <div id="detected-words" class="flex flex-wrap gap-2"></div>
+              </div>
+            </div>
+            
+            <div id="word-details" class="mt-8 bg-white p-6 rounded-xl shadow-md hidden">
+              <div class="flex items-center justify-between mb-4">
+                <h3 id="selected-word" class="text-2xl font-bold text-indigo-600"></h3>
+                <div id="word-phonetic" class="text-gray-500"></div>
+              </div>
+              <div id="word-definition" class="mb-4"></div>
+              <div id="word-examples" class="border-t pt-4">
+                <h4 class="font-semibold mb-2">Ejemplos:</h4>
+                <ul id="example-list" class="list-disc pl-5 space-y-1 text-gray-700"></ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-6">
+      <div class="container mx-auto px-6">
+        <div class="flex flex-col md:flex-row justify-between items-center">
+          <div class="mb-4 md:mb-0">
+            <div class="flex items-center space-x-2">
+              <i class="fas fa-globe text-indigo-400"></i>
+              <span class="font-bold">EnglishMaster</span>
+            </div>
+            <p class="text-sm text-gray-400 mt-1">Aprende inglés de forma interactiva</p>
+          </div>
+          <div class="flex space-x-4">
+            <a href="javascript:void(0)" class="text-gray-400 hover:text-white transition">
+              <i class="fab fa-facebook-f"></i>
+            </a>
+            <a href="javascript:void(0)" class="text-gray-400 hover:text-white transition">
+              <i class="fab fa-twitter"></i>
+            </a>
+            <a href="javascript:void(0)" class="text-gray-400 hover:text-white transition">
+              <i class="fab fa-instagram"></i>
+            </a>
+          </div>
+        </div>
+        <div class="border-t border-gray-700 mt-6 pt-6 text-sm text-center text-gray-400">
+          &copy; 2025 EnglishMaster. Todos los derechos reservados.
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script id="app-script">
+    // State variables
+    let currentSection = '';
+    let currentExerciseIndex = 0;
+    let exercisesData = [];
+    let userAnswers = [];
+    let correctAnswers = 0;
+    
+    // Section information
+    const sections = {
+      'verbos': {
+        title: 'Verbos en inglés',
+        description: 'Aprende los verbos más comunes en inglés y cómo usarlos correctamente.',
+        explanation: 'Los verbos son palabras que expresan acciones, estados o procesos. En inglés, los verbos son esenciales para construir oraciones y comunicarse efectivamente.',
+        examples: [
+          'To run - Correr',
+          'To eat - Comer',
+          'To think - Pensar',
+          'To be - Ser/Estar'
+        ]
+      },
+      'phrasal-verbs': {
+        title: 'Phrasal Verbs',
+        description: 'Domina los verbos compuestos en inglés, esenciales para sonar natural.',
+        explanation: 'Los phrasal verbs son combinaciones de un verbo y una o más partículas (preposiciones o adverbios) que forman una unidad semántica. Son muy comunes en el inglés cotidiano.',
+        examples: [
+          'Look up - Buscar información',
+          'Give up - Rendirse',
+          'Break down - Averiarse',
+          'Get along - Llevarse bien'
+        ]
+      },
+      'regular-irregular': {
+        title: 'Verbos Regulares e Irregulares',
+        description: 'Aprende las diferencias y cómo conjugar correctamente en pasado y participio.',
+        explanation: 'Los verbos regulares siguen un patrón predecible al formar el pasado y participio pasado (añadiendo -ed). Los verbos irregulares no siguen este patrón y tienen formas únicas.',
+        examples: [
+          'Regular: Work → Worked → Worked',
+          'Regular: Play → Played → Played',
+          'Irregular: Go → Went → Gone',
+          'Irregular: Eat → Ate → Eaten'
+        ]
+      },
+      'tiempos-gramaticales': {
+        title: 'Tiempos Gramaticales',
+        description: 'Domina los diferentes tiempos verbales en inglés y cuándo usarlos.',
+        explanation: 'El inglés tiene varios tiempos verbales que expresan cuándo ocurre una acción en relación con el momento de hablar. Cada tiempo tiene su estructura y usos específicos.',
+        examples: [
+          'Present Simple: I work every day.',
+          'Present Continuous: I am working now.',
+          'Past Simple: I worked yesterday.',
+          'Future: I will work tomorrow.'
+        ]
+      },
+      'imagen-palabras': {
+        title: 'Imagen a Palabras',
+        description: 'Sube una imagen y aprende vocabulario relacionado con ella de forma interactiva.'
+      }
+    };
+    
+    // Initialize the app
+    document.addEventListener('DOMContentLoaded', function() {
+      // Set up event listeners for sample images
+      document.querySelectorAll('.sample-image').forEach(img => {
+        img.addEventListener('click', function() {
+          selectSampleImage(this.src);
+        });
+      });
+      
+      // Set up event listener for analyze image button
+      document.getElementById('analyze-image-btn').addEventListener('click', analyzeImage);
+    });
+    
+    // Function to load a section
+    function loadSection(sectionId) {
+      currentSection = sectionId;
+      currentExerciseIndex = 0;
+      exercisesData = [];
+      userAnswers = [];
+      correctAnswers = 0;
+      
+      // Hide main menu and show section content
+      document.getElementById('main-menu').classList.add('hidden');
+      document.getElementById('section-content').classList.remove('hidden');
+      
+      // Update section title and description
+      document.getElementById('section-title').textContent = sections[sectionId].title;
+      document.getElementById('section-description').textContent = sections[sectionId].description;
+      
+      // Show loading indicator
+      document.getElementById('loading').classList.remove('hidden');
+      
+      // Hide all containers first
+      document.getElementById('explanation-panel').classList.add('hidden');
+      document.getElementById('examples-panel').classList.add('hidden');
+      document.getElementById('exercises-container').classList.add('hidden');
+      document.getElementById('image-words-container').classList.add('hidden');
+      
+      // Simulate loading delay (would be replaced by actual API call)
+      setTimeout(() => {
+        document.getElementById('loading').classList.add('hidden');
+        
+        if (sectionId === 'imagen-palabras') {
+          // Show image to words container
+          document.getElementById('image-words-container').classList.remove('hidden');
+        } else {
+          // Show explanation and examples
+          document.getElementById('explanation-panel').classList.remove('hidden');
+          document.getElementById('examples-panel').classList.remove('hidden');
+          
+          // Set explanation and examples content
+          document.getElementById('explanation-content').textContent = sections[sectionId].explanation;
+          
+          const examplesContainer = document.getElementById('examples-content');
+          examplesContainer.innerHTML = '';
+          
+          sections[sectionId].examples.forEach(example => {
+            const exampleDiv = document.createElement('div');
+            exampleDiv.className = 'p-3 bg-gray-50 rounded-lg';
+            exampleDiv.textContent = example;
+            examplesContainer.appendChild(exampleDiv);
+          });
+          
+          // Load exercises
+          loadExercises(sectionId);
+        }
+      }, 1500);
+    }
+    
+    // Function to load exercises for a section
+    function loadExercises(sectionId) {
+      // This would be replaced by an API call to get exercises
+      exercisesData = generateMockExercises(sectionId);
+      
+      // Initialize user answers array
+      userAnswers = new Array(exercisesData.length).fill(null);
+      
+      // Update total exercises count
+      document.getElementById('total-exercises-count').textContent = exercisesData.length;
+      document.getElementById('total-exercises').textContent = exercisesData.length;
+      
+      // Show exercises container
+      document.getElementById('exercises-container').classList.remove('hidden');
+      
+      // Display first exercise
+      displayExercise(0);
+      
+      // Update progress
+      updateProgress();
+    }
+    
+    // Function to display an exercise
+    function displayExercise(index) {
+      const exercise = exercisesData[index];
+      const exerciseContent = document.getElementById('exercise-content');
+      
+      // Update current exercise number
+      document.getElementById('current-exercise').textContent = index + 1;
+      
+      // Clear previous content
+      exerciseContent.innerHTML = '';
+      
+      // Create exercise container
+      const exerciseDiv = document.createElement('div');
+      exerciseDiv.className = 'space-y-4';
+      
+      // Add exercise question
+      const questionDiv = document.createElement('div');
+      questionDiv.className = 'mb-4';
+      questionDiv.innerHTML = `<p class="text-lg font-medium">${exercise.question}</p>`;
+      exerciseDiv.appendChild(questionDiv);
+      
+      // Add exercise content based on type
+      if (exercise.type === 'multiple-choice') {
+        const optionsDiv = document.createElement('div');
+        optionsDiv.className = 'space-y-3';
+        
+        exercise.options.forEach((option, optionIndex) => {
+          const optionBtn = document.createElement('button');
+          optionBtn.className = 'option-btn w-full p-3 text-left rounded-lg border border-gray-300 hover:border-indigo-500 transition';
+          optionBtn.textContent = option;
+          
+          // Check if this option was previously selected
+          if (userAnswers[index] === optionIndex) {
+            optionBtn.classList.add('bg-indigo-100', 'border-indigo-500');
+          }
+          
+          optionBtn.addEventListener('click', () => selectOption(index, optionIndex));
+          optionsDiv.appendChild(optionBtn);
+        });
+        
+        exerciseDiv.appendChild(optionsDiv);
+      } else if (exercise.type === 'fill-in-blank') {
+        const sentenceDiv = document.createElement('div');
+        sentenceDiv.className = 'mb-4 text-lg';
+        
+        const parts = exercise.sentence.split('_____');
+        
+        parts.forEach((part, partIndex) => {
+          sentenceDiv.appendChild(document.createTextNode(part));
+          
+          if (partIndex < parts.length - 1) {
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.className = 'mx-1 px-2 py-1 border-b-2 border-indigo-500 focus:outline-none focus:border-indigo-700 w-32 text-center';
+            input.placeholder = 'Escribe aquí';
+            
+            // Set previously entered value if any
+            if (userAnswers[index] !== null) {
+              input.value = userAnswers[index];
+            }
+            
+            input.addEventListener('input', (e) => {
+              userAnswers[index] = e.target.value.trim();
+              updateProgress();
+            });
+            
+            sentenceDiv.appendChild(input);
+          }
+        });
+        
+        exerciseDiv.appendChild(sentenceDiv);
+      }
+      
+      exerciseContent.appendChild(exerciseDiv);
+      
+      // Handle button states
+      document.getElementById('prev-button').disabled = index === 0;
+      document.getElementById('next-button').disabled = index === exercisesData.length - 1;
+    }
+    
+    // Function to select an option in multiple choice exercise
+    function selectOption(exerciseIndex, optionIndex) {
+      userAnswers[exerciseIndex] = optionIndex;
+      
+      // Update the UI to show selected option
+      const optionButtons = document.querySelectorAll('.option-btn');
+      
+      optionButtons.forEach((btn, idx) => {
+        if (idx === optionIndex) {
+          btn.classList.add('bg-indigo-100', 'border-indigo-500');
+        } else {
+          btn.classList.remove('bg-indigo-100', 'border-indigo-500');
+        }
+      });
+      
+      // Update progress
+      updateProgress();
+    }
+    
+    // Function to go to next exercise
+    function nextExercise() {
+      if (currentExerciseIndex < exercisesData.length - 1) {
+        currentExerciseIndex++;
+        displayExercise(currentExerciseIndex);
+      }
+    }
+    
+    // Function to go to previous exercise
+    function previousExercise() {
+      if (currentExerciseIndex > 0) {
+        currentExerciseIndex--;
+        displayExercise(currentExerciseIndex);
+      }
+    }
+    
+    // Function to update progress indicators
+    function updateProgress() {
+      // Calculate answered exercises
+      const answeredCount = userAnswers.filter(answer => answer !== null).length;
+      const progressPercentage = Math.round((answeredCount / exercisesData.length) * 100);
+      
+      // Update progress bar and text
+      document.getElementById('progress-value').style.width = `${progressPercentage}%`;
+      document.getElementById('progress-text').textContent = `${progressPercentage}%`;
+      
+      // Update mobile progress
+      document.getElementById('mobile-progress-value').style.width = `${progressPercentage}%`;
+      document.getElementById('mobile-progress').textContent = `${progressPercentage}%`;
+      
+      // Update success count (this would normally be calculated based on correct answers)
+      // For prototype, we'll just set it to a portion of answered questions
+      const successCount = Math.floor(answeredCount * 0.8); // 80% correct for demo
+      document.getElementById('success-count').textContent = successCount;
+      
+      // Show progress container if hidden
+      document.getElementById('progress-container').classList.remove('hidden');
+    }
+    
+    // Function to restart current section
+    function restartSection() {
+      // Reset variables
+      currentExerciseIndex = 0;
+      userAnswers = new Array(exercisesData.length).fill(null);
+      correctAnswers = 0;
+      
+      // Reset UI
+      displayExercise(0);
+      updateProgress();
+    }
+    
+    // Function to return to main menu
+    function showMainMenu() {
+      // Hide section content and show main menu
+      document.getElementById('section-content').classList.add('hidden');
+      document.getElementById('main-menu').classList.remove('hidden');
+      
+      // Hide progress indicator
+      document.getElementById('progress-container').classList.add('hidden');
+      
+      // Reset image analysis results if shown
+      document.getElementById('image-results').classList.add('hidden');
+      document.getElementById('word-details').classList.add('hidden');
+    }
+    
+    // Function to select a sample image
+    function selectSampleImage(src) {
+      const imgPreview = document.createElement('div');
+      imgPreview.className = 'mt-4 border-2 border-dashed border-gray-300 p-2 rounded-lg';
+      imgPreview.innerHTML = `
+        <img src="${src}" alt="Selected image" class="mx-auto h-48 object-contain">
+        <p class="text-center text-sm text-gray-500 mt-2">Imagen seleccionada</p>
+      `;
+      
+      // Remove previous preview if exists
+      const existingPreview = document.querySelector('.mt-4.border-2.border-dashed');
+      if (existingPreview) {
+        existingPreview.remove();
+      }
+      
+      document.getElementById('image-upload').parentNode.appendChild(imgPreview);
+    }
+    
+    // Function to analyze image
+    function analyzeImage() {
+      // Show loading
+      document.getElementById('loading').classList.remove('hidden');
+      document.getElementById('image-results').classList.add('hidden');
+      
+      // Get selected image
+      let imageSrc = '';
+      const existingPreview = document.querySelector('.mt-4.border-2.border-dashed img');
+      
+      if (existingPreview) {
+        imageSrc = existingPreview.src;
+      } else if (document.getElementById('image-upload').files.length > 0) {
+        // Handle file upload preview (would require FileReader in real implementation)
+        // For prototype, we'll use a default image
+        imageSrc = 'https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885_1280.jpg';
+      } else {
+        // No image selected
+        alert('Por favor, selecciona o sube una imagen primero.');
+        document.getElementById('loading').classList.add('hidden');
+        return;
+      }
+      
+      // Simulate API call delay
+      setTimeout(() => {
+        document.getElementById('loading').classList.add('hidden');
+        document.getElementById('image-results').classList.remove('hidden');
+        
+        // Set analyzed image
+        document.getElementById('analyzed-image').src = imageSrc;
+        
+        // Generate mock detected words
+        const detectedWordsContainer = document.getElementById('detected-words');
+        detectedWordsContainer.innerHTML = '';
+        
+        // Sample words based on nature image
+        const sampleWords = [
+          'tree', 'sky', 'mountain', 'nature', 'landscape', 
+          'forest', 'field', 'sunset', 'clouds', 'grass'
+        ];
+        
+        sampleWords.forEach(word => {
+          const wordTag = document.createElement('div');
+          wordTag.className = 'word-tag px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm font-medium';
+          wordTag.textContent = word;
+          wordTag.addEventListener('click', () => showWordDetails(word));
+          detectedWordsContainer.appendChild(wordTag);
+        });
+      }, 2000);
+    }
+    
+    // Function to show word details
+    function showWordDetails(word) {
+      const wordDetails = document.getElementById('word-details');
+      wordDetails.classList.remove('hidden');
+      
+      // Set selected word
+      document.getElementById('selected-word').textContent = word;
+      
+      // Set phonetic (mock data)
+      document.getElementById('word-phonetic').textContent = '/təˈmeɪtoʊ/';
+      
+      // Set definition (mock data)
+      let definition = '';
+      let examples = [];
+      
+      switch(word) {
+        case 'tree':
+          definition = 'A tall plant that has a wooden trunk and branches that grow from its upper part.';
+          examples = [
+            'We planted a tree in our garden.',
+            'The birds were singing in the trees.',
+            'She climbed up the tree to pick some apples.'
+          ];
+          break;
+        case 'sky':
+          definition = 'The area above the earth that you can see when you look up, where clouds and the sun, moon, and stars appear.';
+          examples = [
+            'The sky was clear and blue.',
+            'Dark clouds filled the sky before the storm.',
+            'We lay on our backs and looked up at the night sky.'
+          ];
+          break;
+        default:
+          definition = 'This is a prototype definition for the word "' + word + '".';
+          examples = [
+            'Example sentence 1 using ' + word + '.',
+            'Example sentence 2 using ' + word + '.',
+            'Example sentence 3 using ' + word + '.'
+          ];
+      }
+      
+      document.getElementById('word-definition').textContent = definition;
+      
+      // Set examples
+      const exampleList = document.getElementById('example-list');
+      exampleList.innerHTML = '';
+      
+      examples.forEach(example => {
+        const li = document.createElement('li');
+        li.textContent = example;
+        exampleList.appendChild(li);
+      });
+    }
+    
+    // Function to generate mock exercises
+    function generateMockExercises(sectionId) {
+      let mockExercises = [];
+      
+      switch(sectionId) {
+        case 'verbos':
+          mockExercises = [
+            {
+              type: 'multiple-choice',
+              question: '¿Cuál es el significado del verbo "to achieve"?',
+              options: ['Lograr', 'Acordar', 'Actuar', 'Añadir'],
+              correctAnswer: 0
+            },
+            {
+              type: 'fill-in-blank',
+              question: 'Completa la oración con la forma correcta del verbo "to go".',
+              sentence: 'Yesterday, I _____ to the beach with my friends.',
+              correctAnswer: 'went'
+            },
+            {
+              type: 'multiple-choice',
+              question: '¿Cuál es el verbo correcto para la siguiente definición: "to move from one place to another"?',
+              options: ['To run', 'To travel', 'To jump', 'To stay'],
+              correctAnswer: 1
+            },
+            {
+              type: 'multiple-choice',
+              question: '¿Qué verbo se usa para expresar "pensar" en inglés?',
+              options: ['To speak', 'To tell', 'To think', 'To talk'],
+              correctAnswer: 2
+            },
+            {
+              type: 'fill-in-blank',
+              question: 'Completa la oración con el verbo adecuado.',
+              sentence: 'She _____ three languages fluently.',
+              correctAnswer: 'speaks'
+            }
+          ];
+          break;
+        case 'phrasal-verbs':
+          mockExercises = [
+            {
+              type: 'multiple-choice',
+              question: '¿Qué significa el phrasal verb "give up"?',
+              options: ['Entregar', 'Rendirse', 'Ceder', 'Levantar'],
+              correctAnswer: 1
+            },
+            {
+              type: 'fill-in-blank',
+              question: 'Completa la oración con el phrasal verb correcto usando "look".',
+              sentence: 'I need to _____ this word in the dictionary.',
+              correctAnswer: 'look up'
+            },
+            {
+              type: 'multiple-choice',
+              question: '¿Cuál es el significado de "break down"?',
+              options: ['Romper en pedazos', 'Averiarse', 'Descomponer algo', 'Bajar rompiendo'],
+              correctAnswer: 1
+            },
+            {
+              type: 'multiple-choice',
+              question: 'Selecciona el significado correcto de "put off".',
+              options: ['Apagar', 'Alejar', 'Posponer', 'Rechazar'],
+              correctAnswer: 2
+            },
+            {
+              type: 'fill-in-blank',
+              question: 'Completa la oración con el phrasal verb adecuado.',
+              sentence: 'The teacher asked us to _____ our homework for tomorrow.',
+              correctAnswer: 'turn in'
+            }
+          ];
+          break;
+        case 'regular-irregular':
+          mockExercises = [
+            {
+              type: 'multiple-choice',
+              question: '¿Cuál es la forma del pasado simple del verbo "to go"?',
+              options: ['Goed', 'Gone', 'Went', 'Going'],
+              correctAnswer: 2
+            },
+            {
+              type: 'fill-in-blank',
+              question: 'Completa con el pasado simple del verbo "to eat".',
+              sentence: 'Yesterday, we _____ at a new restaurant.',
+              correctAnswer: 'ate'
+            },
+            {
+              type: 'multiple-choice',
+              question: '¿Cuál de estos verbos es regular?',
+              options: ['See', 'Play', 'Drink', 'Bring'],
+              correctAnswer: 1
+            },
+            {
+              type: 'multiple-choice',
+              question: '¿Cuál es el participio pasado de "write"?',
+              options: ['Wrote', 'Written', 'Writed', 'Writing'],
+              correctAnswer: 1
+            },
+            {
+              type: 'fill-in-blank',
+              question: 'Completa con el participio pasado del verbo "to speak".',
+              sentence: 'We have _____ to the manager about our concerns.',
+              correctAnswer: 'spoken'
+            }
+          ];
+          break;
+        case 'tiempos-gramaticales':
+          mockExercises = [
+            {
+              type: 'multiple-choice',
+              question: '¿Qué tiempo verbal se usa en la oración "I am studying English"?',
+              options: ['Present Simple', 'Present Continuous', 'Past Simple', 'Future Simple'],
+              correctAnswer: 1
+            },
+            {
+              type: 'fill-in-blank',
+              question: 'Completa la oración con la forma correcta del Present Perfect.',
+              sentence: 'She _____ (live) in Paris for ten years.',
+              correctAnswer: 'has lived'
+            },
+            {
+              type: 'multiple-choice',
+              question: '¿Qué tiempo verbal se usa para acciones habituales?',
+              options: ['Present Simple', 'Present Continuous', 'Past Simple', 'Present Perfect'],
+              correctAnswer: 0
+            },
+            {
+              type: 'multiple-choice',
+              question: 'Selecciona la oración con el tiempo verbal correcto para expresar una acción futura planeada.',
+              options: [
+                'I will go to the beach tomorrow.',
+                'I am going to the beach tomorrow.',
+                'I go to the beach tomorrow.',
+                'I have gone to the beach tomorrow.'
+              ],
+              correctAnswer: 1
+            },
+            {
+              type: 'fill-in-blank',
+              question: 'Completa la oración con la forma correcta del Past Continuous.',
+              sentence: 'When I arrived, they _____ (watch) a movie.',
+              correctAnswer: 'were watching'
+            }
+          ];
+          break;
+        default:
+          mockExercises = [];
+      }
+      
+      return mockExercises;
+    }
+  </script>
+</body>
+</html>

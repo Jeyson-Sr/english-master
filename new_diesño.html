@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>English Learning App</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style id="app-style">
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #F8FAFC;
+      color: #1E293B;
+    }
+    
+    .app-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .method-card {
+      transition: transform 0.3s ease;
+      border-radius: 1rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .method-card:hover {
+      transform: translateY(-5px);
+    }
+    
+    .verb-card {
+      background-color: #EEF2FF;
+      border-left: 4px solid #4F46E5;
+    }
+    
+    .reading-card {
+      background-color: #ECFDF5;
+      border-left: 4px solid #059669;
+    }
+    
+    .vocab-card {
+      background-color: #FEF2F2;
+      border-left: 4px solid #DC2626;
+    }
+    
+    .progress-circle {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+    }
+    
+    .highlighted-word {
+      text-decoration: underline;
+      text-decoration-style: dotted;
+      cursor: pointer;
+      color: #4F46E5;
+    }
+    
+    .tab-active {
+      border-bottom: 3px solid #4F46E5;
+      color: #4F46E5;
+      font-weight: 600;
+    }
+    
+    .slide-enter {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    
+    .slide-enter-active {
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity 300ms, transform 300ms;
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+      animation: fadeIn 0.5s;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .modal.active {
+      display: flex;
+    }
+  </style>
+</head>
+<body>
+  <div id="app" class="min-h-screen flex flex-col">
+    <!-- Landing Page -->
+    <section id="landing-page" class="flex flex-col min-h-screen">
+      <!-- Header -->
+      <header class="bg-white shadow-sm py-4">
+        <div class="container mx-auto px-4 flex justify-between items-center">
+          <div class="flex items-center">
+            <div class="text-2xl font-bold text-indigo-600">
+              <i class="fas fa-language mr-2"></i>EnglishPro
+            </div>
+          </div>
+          <div class="flex items-center space-x-4">
+            <div class="hidden md:block w-48 bg-gray-200 rounded-full h-3">
+              <div class="bg-indigo-600 h-3 rounded-full" style="width: 35%"></div>
+            </div>
+            <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center cursor-pointer" onclick="navigateTo('profile-page')">
+              <i class="fas fa-user text-indigo-600"></i>
+            </div>
+          </div>
+        </div>
+      </header>
+      
+      <!-- Main Content -->
+      <main class="flex-grow container mx-auto px-4 py-8">
+        <h1 class="text-3xl md:text-4xl font-bold text-center mb-12">Elige tu método de aprendizaje</h1>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+          <!-- Verbs Card -->
+          <div class="method-card bg-white p-6 rounded-xl border border-gray-200 flex flex-col">
+            <div class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mb-4">
+              <i class="fas fa-book text-2xl text-indigo-600"></i>
+            </div>
+            <h2 class="text-xl font-bold text-indigo-600 mb-2">Dominio de Verbos</h2>
+            <p class="text-gray-600 mb-6 flex-grow">Aprende y domina los verbos ingleses en todos sus tiempos. Práctica con ejercicios interactivos y ejemplos contextuales.</p>
+            <button onclick="navigateTo('verbs-page')" class="bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 transition flex items-center justify-center">
+              Comenzar <i class="fas fa-arrow-right ml-2"></i>
+            </button>
+          </div>
+          
+          <!-- Reading Card -->
+          <div class="method-card bg-white p-6 rounded-xl border border-gray-200 flex flex-col">
+            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
+              <i class="fas fa-book-open text-2xl text-green-600"></i>
+            </div>
+            <h2 class="text-xl font-bold text-green-600 mb-2">Lectura Interactiva</h2>
+            <p class="text-gray-600 mb-6 flex-grow">Mejora tu comprensión con textos adaptados a tu nivel. Aprende vocabulario nuevo interactuando con el contenido.</p>
+            <button onclick="navigateTo('reading-page')" class="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition flex items-center justify-center">
+              Comenzar <i class="fas fa-arrow-right ml-2"></i>
+            </button>
+          </div>
+          
+          <!-- Vocabulary Card - Centered on larger screens -->
+          <div class="method-card bg-white p-6 rounded-xl border border-gray-200 md:col-span-2 max-w-md mx-auto flex flex-col">
+            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
+              <i class="fas fa-images text-2xl text-red-600"></i>
+            </div>
+            <h2 class="text-xl font-bold text-red-600 mb-2">Vocabulario Visual</h2>
+            <p class="text-gray-600 mb-6 flex-grow">Expande tu vocabulario con imágenes asociativas y ejercicios de memorización. Categorías temáticas para un aprendizaje organizado.</p>
+            <button class="bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition flex items-center justify-center">
+              Comenzar <i class="fas fa-arrow-right ml-2"></i>
+            </button>
+          </div>
+        </div>
+      </main>
+      
+      <!-- Footer -->
+      <footer class="bg-gray-800 text-white py-6">
+        <div class="container mx-auto px-4">
+          <div class="flex flex-col md:flex-row justify-between items-center">
+            <div class="mb-4 md:mb-0">
+              <p>&copy; 2025 EnglishPro - Todos los derechos reservados</p>
+            </div>
+            <div class="flex space-x-4">
+              <a href="javascript:void(0)" class="text-white hover:text-indigo-300 transition">
+                <i class="fab fa-facebook-f"></i>
+              </a>
+              <a href="javascript:void(0)" class="text-white hover:text-indigo-300 transition">
+                <i class="fab fa-twitter"></i>
+              </a>
+              <a href="javascript:void(0)" class="text-white hover:text-indigo-300 transition">
+                <i class="fab fa-instagram"></i>
+              </a>
+              <a href="javascript:void(0)" class="text-white hover:text-indigo-300 transition">
+                <i class="fab fa-youtube"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </section>
+    
+    <!-- Verbs Dashboard Page -->
+    <section id="verbs-page" class="flex flex-col min-h-screen hidden">
+      <!-- Header -->
+      <header class="bg-white shadow-sm py-4">
+        <div class="container mx-auto px-4 flex justify-between items-center">
+          <div class="flex items-center">
+            <div class="text-2xl font-bold text-indigo-600">
+              <i class="fas fa-language mr-2"></i>EnglishPro
+            </div>
+          </div>
+          <div class="flex items-center space-x-4">
+            <div class="w-48 bg-gray-200 rounded-full h-3">
+              <div class="bg-indigo-600 h-3 rounded-full" style="width: 35%"></div>
+            </div>
+            <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center cursor-pointer" onclick="navigateTo('profile-page')">
+              <i class="fas fa-user text-indigo-600"></i>
+            </div>
+          </div>
+        </div>
+      </header>
+      
+      <!-- Main Content -->
+      <main class="flex-grow container mx-auto px-4 py-8">
+        <!-- Breadcrumb -->
+        <div class="flex items-center text-sm mb-6">
+          <a href="javascript:void(0)" onclick="navigateTo('landing-page')" class="text-gray-500 hover:text-indigo-600">Inicio</a>
+          <i class="fas fa-chevron-right mx-2 text-gray-400 text-xs"></i>
+          <span class="text-indigo-600 font-medium">Verbos</span>
+        </div>
+        
+        <h1 class="text-3xl font-bold mb-8 text-indigo-600">Dashboard de Verbos</h1>
+        
+        <!-- Tabs -->
+        <div class="border-b border-gray-200 mb-6">
+          <div class="flex space-x-8">
+            <button class="tab-button tab-active py-2 px-1" data-tab="regulares">Regulares</button>
+            <button class="tab-button py-2 px-1" data-tab="irregulares">Irregulares</button>
+            <button class="tab-button py-2 px-1" data-tab="tiempos">Tiempos</button>
+            <button class="tab-button py-2 px-1" data-tab="phrasal">Phrasal Verbs</button>
+          </div>
+        </div>
+        
+        <!-- Tab Content -->
+        <div id="regulares" class="tab-content active">
+          <div class="space-y-4">
+            <!-- Lesson 1 -->
+            <div class="verb-card p-4 rounded-lg flex items-center">
+              <div class="progress-circle bg-indigo-100 text-indigo-600 mr-4">
+                1
+              </div>
+              <div class="flex-grow">
+                <h3 class="font-medium">Verbos regulares en presente simple</h3>
+                <p class="text-gray-600 text-sm">Aprende la estructura básica y las reglas de conjugación</p>
+              </div>
+              <button class="bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 transition">
+                Empezar
+              </button>
+            </div>
+            
+            <!-- Lesson 2 -->
+            <div class="verb-card p-4 rounded-lg flex items-center">
+              <div class="progress-circle bg-indigo-100 text-indigo-600 mr-4">
+                2
+              </div>
+              <div class="flex-grow">
+                <h3 class="font-medium">Verbos regulares en pasado simple</h3>
+                <p class="text-gray-600 text-sm">Cómo formar el pasado añadiendo -ed y sus excepciones</p>
+              </div>
+              <button class="bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 transition">
+                Empezar
+              </button>
+            </div>
+            
+            <!-- Lesson 3 -->
+            <div class="verb-card p-4 rounded-lg flex items-center">
+              <div class="progress-circle bg-indigo-100 text-indigo-600 mr-4">
+                3
+              </div>
+              <div class="flex-grow">
+                <h3 class="font-medium">Verbos regulares en futuro simple</h3>
+                <p class="text-gray-600 text-sm">Uso de will y going to con verbos regulares</p>
+              </div>
+              <button class="bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 transition">
+                Empezar
+              </button>
+            </div>
+            
+            <!-- Lesson 4 -->
+            <div class="verb-card p-4 rounded-lg flex items-center">
+              <div class="progress-circle bg-indigo-100 text-indigo-600 mr-4">
+                4
+              </div>
+              <div class="flex-grow">
+                <h3 class="font-medium">Verbos regulares con -ing</h3>
+                <p class="text-gray-600 text-sm">Reglas para formar el gerundio y presente continuo</p>
+              </div>
+              <button class="bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 transition">
+                Empezar
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <div id="irregulares" class="tab-content">
+          <div class="space-y-4">
+            <!-- Lesson 1 -->
+            <div class="verb-card p-4 rounded-lg flex items-center">
+              <div class="progress-circle bg-indigo-100 text-indigo-600 mr-4">
+                1
+              </div>
+              <div class="flex-grow">
+                <h3 class="font-medium">Verbos irregulares comunes</h3>
+                <p class="text-gray-600 text-sm">Los 20 verbos irregulares más usados en inglés</p>
+              </div>
+              <button class="bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 transition">
+                Empezar
+              </button>
+            </div>
+            
+            <!-- Lesson 2 -->
+            <div class="verb-card p-4 rounded-lg flex items-center">
+              <div class="progress-circle bg-indigo-100 text-indigo-600 mr-4">
+                2
+              </div>
+              <div class="flex-grow">
+                <h3 class="font-medium">Patrones de verbos irregulares</h3>
+                <p class="text-gray-600 text-sm">Grupos y patrones para memorizar verbos irregulares</p>
+              </div>
+              <button class="bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 transition">
+                Empezar
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <div id="tiempos" class="tab-content">
+          <div class="space-y-4">
+            <!-- Lesson 1 -->
+            <div class="verb-card p-4 rounded-lg flex items-center">
+              <div class="progress-circle bg-indigo-100 text-indigo-600 mr-4">
+                1
+              </div>
+              <div class="flex-grow">
+                <h3 class="font-medium">Presente perfecto</h3>
+                <p class="text-gray-600 text-sm">Formación y usos del presente perfecto</p>
+              </div>
+              <button class="bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 transition">
+                Empezar
+              </button>
+            </div>
+            
+            <!-- Lesson 2 -->
+            <div class="verb-card p-4 rounded-lg flex items-center">
+              <div class="progress-circle bg-indigo-100 text-indigo-600 mr-4">
+                2
+              </div>
+              <div class="flex-grow">
+                <h3 class="font-medium">Pasado continuo</h3>
+                <p class="text-gray-600 text-sm">Estructura y contextos de uso del pasado continuo</p>
+              </div>
+              <button class="bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 transition">
+                Empezar
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <div id="phrasal" class="tab-content">
+          <div class="space-y-4">
+            <!-- Lesson 1 -->
+            <div class="verb-card p-4 rounded-lg flex items-center">
+              <div class="progress-circle bg-indigo-100 text-indigo-600 mr-4">
+                1
+              </div>
+              <div class="flex-grow">
+                <h3 class="font-medium">Phrasal verbs con "get"</h3>
+                <p class="text-gray-600 text-sm">Combinaciones comunes con el verbo "get"</p>
+              </div>
+              <button class="bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 transition">
+                Empezar
+              </button>
+            </div>
+            
+            <!-- Lesson 2 -->
+            <div class="verb-card p-4 rounded-lg flex items-center">
+              <div class="progress-circle bg-indigo-100 text-indigo-600 mr-4">
+                2
+              </div>
+              <div class="flex-grow">
+                <h3 class="font-medium">Phrasal verbs separables</h3>
+                <p class="text-gray-600 text-sm">Cómo usar verbos frasales que pueden separarse</p>
+              </div>
+              <button class="bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 transition">
+                Empezar
+              </button>
+            </div>
+          </div>
+        </div>
+      </main>
+      
+      <!-- Footer -->
+      <footer class="bg-gray-800 text-white py-6">
+        <div class="container mx-auto px-4">
+          <div class="flex flex-col md:flex-row justify-between items-center">
+            <div class="mb-4 md:mb-0">
+              <p>&copy; 2025 EnglishPro - Todos los derechos reservados</p>
+            </div>
+            <div class="flex space-x-4">
+              <a href="javascript:void(0)" class="text-white hover:text-indigo-300 transition">
+                <i class="fab fa-facebook-f"></i>
+              </a>
+              <a href="javascript:void(0)" class="text-white hover:text-indigo-300 transition">
+                <i class="fab fa-twitter"></i>
+              </a>
+              <a href="javascript:void(0)" class="text-white hover:text-indigo-300 transition">
+                <i class="fab fa-instagram"></i>
+              </a>
+              <a href="javascript:void(0)" class="text-white hover:text-indigo-300 transition">
+                <i class="fab fa-youtube"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </section>
+    
+    <!-- Reading Page -->
+    <section id="reading-page" class="flex flex-col min-h-screen hidden">
+      <!-- Header -->
+      <header class="bg-white shadow-sm py-4">
+        <div class="container mx-auto px-4 flex justify-between items-center">
+          <div class="flex items-center">
+            <div class="text-2xl font-bold text-green-600">
+              <i class="fas fa-language mr-2"></i>EnglishPro
+            </div>
+          </div>
+          <div class="flex items-center space-x-4">
+            <div class="w-48 bg-gray-200 rounded-full h-3">
+              <div class="bg-green-600 h-3 rounded-full" style="width: 45%"></div>
+            </div>
+            <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center cursor-pointer" onclick="navigateTo('profile-page')">
+              <i class="fas fa-user text-green-600"></i>
+            </div>
+          </div>
+        </div>
+      </header>
+      
+      <!-- Main Content -->
+      <main class="flex-grow container mx-auto px-4 py-8">
+        <!-- Breadcrumb -->
+        <div class="flex items-center text-sm mb-6">
+          <a href="javascript:void(0)" onclick="navigateTo('landing-page')" class="text-gray-500 hover:text-green-600">Inicio</a>
+          <i class="fas fa-chevron-right mx-2 text-gray-400 text-xs"></i>
+          <span class="text-green-600 font-medium">Lectura Interactiva</span>
+        </div>
+        
+        <div class="flex flex-col md:flex-row gap-6">
+          <!-- Main Reading Panel (70%) -->
+          <div class="md:w-8/12 bg-white p-6 rounded-xl shadow-sm">
+            <div class="flex flex-col sm:flex-row justify-between mb-6">
+              <div class="mb-4 sm:mb-0">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Nivel</label>
+                <select class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500">
+                  <option>Principiante</option>
+                  <option selected>Intermedio</option>
+                  <option>Avanzado</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Tema</label>
+                <select class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500">
+                  <option>Viajes</option>
+                  <option selected>Tecnología</option>
+                  <option>Cultura</option>
+                  <option>Negocios</option>
+                </select>
+              </div>
+            </div>
+            
+            <h2 class="text-xl font-bold mb-4">The Future of Technology</h2>
+            
+            <div class="prose max-w-none">
+              <p class="mb-4">Technology continues to evolve at an <span class="highlighted-word" onclick="showWordModal('unprecedented')">unprecedented</span> pace. The <span class="highlighted-word" onclick="showWordModal('innovations')">innovations</span> we see today were once just science fiction.</p>
+              
+              <p class="mb-4">Artificial Intelligence is now <span class="highlighted-word" onclick="showWordModal('embedded')">embedded</span> in many aspects of our daily lives. From smart assistants to <span class="highlighted-word" onclick="showWordModal('autonomous')">autonomous</span> vehicles, AI is changing how we interact with the world.</p>
+              
+              <p class="mb-4">The <span class="highlighted-word" onclick="showWordModal('advent')">advent</span> of 5G networks has <span class="highlighted-word" onclick="showWordModal('revolutionized')">revolutionized</span> mobile communications. Data can now be transferred at <span class="highlighted-word" onclick="showWordModal('staggering')">staggering</span> speeds.</p>
+              
+              <p class="mb-4">Virtual Reality and Augmented Reality are <span class="highlighted-word" onclick="showWordModal('transforming')">transforming</span> entertainment, education, and professional training. These technologies offer <span class="highlighted-word" onclick="showWordModal('immersive')">immersive</span> experiences that were impossible before.</p>
+              
+              <p class="mb-4">As technology becomes more <span class="highlighted-word" onclick="showWordModal('sophisticated')">sophisticated</span>, we must consider the ethical <span class="highlighted-word" onclick="showWordModal('implications')">implications</span> of these advances. Privacy concerns and digital security are more important than ever.</p>
+            </div>
+          </div>
+          
+          <!-- Vocabulary Panel (30%) -->
+          <div class="md:w-4/12 bg-white p-6 rounded-xl shadow-sm">
+            <h3 class="text-lg font-bold mb-4 text-green-600">Palabras guardadas</h3>
+            <div class="space-y-4">
+              <div class="border-b pb-3">
+                <div class="flex justify-between">
+                  <div>
+                    <p class="font-medium">unprecedented</p>
+                    <p class="text-sm text-gray-600">Never done or known before</p>
+                  </div>
+                  <button class="text-green-600 hover:text-green-700">
+                    <i class="fas fa-bookmark"></i>
+                  </button>
+                </div>
+              </div>
+              
+              <div class="border-b pb-3">
+                <div class="flex justify-between">
+                  <div>
+                    <p class="font-medium">innovations</p>
+                    <p class="text-sm text-gray-600">New methods, ideas, or products</p>
+                  </div>
+                  <button class="text-green-600 hover:text-green-700">
+                    <i class="fas fa-bookmark"></i>
+                  </button>
+                </div>
+              </div>
+              
+              <div class="border-b pb-3">
+                <div class="flex justify-between">
+                  <div>
+                    <p class="font-medium">autonomous</p>
+                    <p class="text-sm text-gray-600">Independent or self-governing</p>
+                  </div>
+                  <button class="text-green-600 hover:text-green-700">
+                    <i class="fas fa-bookmark"></i>
+                  </button>
+                </div>
+              </div>
+              
+              <p class="text-sm text-gray-500 mt-6">Las palabras guardadas se sincronizarán con tu perfil y estarán disponibles para repaso.</p>
+            </div>
+          </div>
+        </div>
+      </main>
+      
+      <!-- Footer -->
+      <footer class="bg-gray-800 text-white py-6">
+        <div class="container mx-auto px-4">
+          <div class="flex flex-col md:flex-row justify-between items-center">
+            <div class="mb-4 md:mb-0">
+              <p>&copy; 2025 EnglishPro - Todos los derechos reservados</p>
+            </div>
+            <div class="flex space-x-4">
+              <a href="javascript:void(0)" class="text-white hover:text-green-300 transition">
+                <i class="fab fa-facebook-f"></i>
+              </a>
+              <a href="javascript:void(0)" class="text-white hover:text-green-300 transition">
+                <i class="fab fa-twitter"></i>
+              </a>
+              <a href="javascript:void(0)" class="text-white hover:text-green-300 transition">
+                <i class="fab fa-instagram"></i>
+              </a>
+              <a href="javascript:void(0)" class="text-white hover:text-green-300 transition">
+                <i class="fab fa-youtube"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </footer>
+      
+      <!-- Word Modal -->
+      <div id="word-modal" class="modal">
+        <div class="bg-white rounded-xl max-w-md w-full p-6 relative">
+          <button onclick="closeWordModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+            <i class="fas fa-times"></i>
+          </button>
+          
+          <h3 id="modal-word" class="text-xl font-bold mb-2 text-green-600">unprecedented</h3>
+          
+          <div class="flex items-center space-x-2 mb-4">
+            <p id="modal-pronunciation" class="text-gray-600">/ʌnˈpresɪdentɪd/</p>
+            <button class="text-green-600 hover:text-green-700">
+              <i class="fas fa-volume-up"></i>
+            </button>
+          </div>
+          
+          <div class="mb-4">
+            <p class="font-medium mb-1">Definición:</p>
+            <p id="modal-definition" class="text-gray-700">Never done or known before; without previous example.</p>
+          </div>
+          
+          <div class="mb-4">
+            <p class="font-medium mb-1">Ejemplo:</p>
+            <p id="modal-example" class="text-gray-700">The internet brought unprecedented changes to how we communicate.</p>
+          </div>
+          
+          <div class="flex justify-between">
+            <button class="border border-green-600 text-green-600 px-4 py-2 rounded-lg hover:bg-green-50 transition">
+              Agregar a repaso
+            </button>
+            <button class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
+              Guardar
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Profile/Progress Page -->
+    <section id="profile-page" class="flex flex-col min-h-screen hidden">
+      <!-- Header -->
+      <header class="bg-white shadow-sm py-4">
+        <div class="container mx-auto px-4 flex justify-between items-center">
+          <div class="flex items-center">
+            <div class="text-2xl font-bold text-indigo-600">
+              <i class="fas fa-language mr-2"></i>EnglishPro
+            </div>
+          </div>
+          <div class="flex items-center space-x-4">
+            <div class="w-48 bg-gray-200 rounded-full h-3">
+              <div class="bg-indigo-600 h-3 rounded-full" style="width: 35%"></div>
+            </div>
+            <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center">
+              <i class="fas fa-user text-indigo-600"></i>
+            </div>
+          </div>
+        </div>
+      </header>
+      
+      <!-- Main Content -->
+      <main class="flex-grow container mx-auto px-4 py-8">
+        <!-- Breadcrumb -->
+        <div class="flex items-center text-sm mb-6">
+          <a href="javascript:void(0)" onclick="navigateTo('landing-page')" class="text-gray-500 hover:text-indigo-600">Inicio</a>
+          <i class="fas fa-chevron-right mx-2 text-gray-400 text-xs"></i>
+          <span class="text-indigo-600 font-medium">Perfil</span>
+        </div>
+        
+        <div class="flex flex-col md:flex-row gap-8">
+          <!-- Left Column -->
+          <div class="md:w-1/3">
+            <div class="bg-white p-6 rounded-xl shadow-sm mb-6">
+              <div class="flex items-center space-x-4 mb-6">
+                <div class="w-16 h-16 rounded-full bg-indigo-100 flex items-center justify-center">
+                  <i class="fas fa-user text-2xl text-indigo-600"></i>
+                </div>
+                <div>
+                  <h2 class="text-xl font-bold">Usuario</h2>
+                  <p class="text-gray-600">Nivel: Intermedio</p>
+                </div>
+              </div>
+              
+              <div class="space-y-4">
+                <div>
+                  <p class="font-medium mb-1">Días consecutivos</p>
+                  <div class="flex space-x-1">
+                    <div class="w-8 h-8 bg-indigo-600 rounded-md flex items-center justify-center text-white">L</div>
+                    <div class="w-8 h-8 bg-indigo-600 rounded-md flex items-center justify-center text-white">M</div>
+                    <div class="w-8 h-8 bg-indigo-600 rounded-md flex items-center justify-center text-white">X</div>
+                    <div class="w-8 h-8 bg-indigo-600 rounded-md flex items-center justify-center text-white">J</div>
+                    <div class="w-8 h-8 bg-gray-200 rounded-md flex items-center justify-center text-gray-500">V</div>
+                    <div class="w-8 h-8 bg-gray-200 rounded-md flex items-center justify-center text-gray-500">S</div>
+                    <div class="w-8 h-8 bg-gray-200 rounded-md flex items-center justify-center text-gray-500">D</div>
+                  </div>
+                </div>
+                
+                <div>
+                  <p class="font-medium mb-2">Progreso general</p>
+                  <div class="w-full bg-gray-200 rounded-full h-4 mb-1">
+                    <div class="bg-indigo-600 h-4 rounded-full" style="width: 35%"></div>
+                  </div>
+                  <p class="text-sm text-gray-600">35% completado</p>
+                </div>
+              </div>
+            </div>
+            
+            <div class="bg-white p-6 rounded-xl shadow-sm">
+              <h3 class="text-lg font-bold mb-4">Configuración</h3>
+              
+              <div class="space-y-4">
+                <div>
+                  <label class="flex items-center cursor-pointer">
+                    <input type="checkbox" class="form-checkbox h-5 w-5 text-indigo-600" checked>
+                    <span class="ml-2 text-gray-700">Notificaciones diarias</span>
+                  </label>
+                </div>
+                
+                <div>
+                  <label class="flex items-center cursor-pointer">
+                    <input type="checkbox" class="form-checkbox h-5 w-5 text-indigo-600" checked>
+                    <span class="ml-2 text-gray-700">Reproducir audio automáticamente</span>
+                  </label>
+                </div>
+                
+                <div>
+                  <label class="flex items-center cursor-pointer">
+                    <input type="checkbox" class="form-checkbox h-5 w-5 text-indigo-600">
+                    <span class="ml-2 text-gray-700">Modo oscuro</span>
+                  </label>
+                </div>
+                
+                <div>
+                  <p class="font-medium mb-1">Idioma de la interfaz</p>
+                  <select class="border border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <option selected>Español</option>
+                    <option>English</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Right Column -->
+          <div class="md:w-2/3">
+            <div class="bg-white p-6 rounded-xl shadow-sm mb-6">
+              <h3 class="text-lg font-bold mb-4">Lecciones desbloqueadas</h3>
+              
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <!-- Verb Section -->
+                <div class="border border-indigo-100 rounded-lg p-4">
+                  <div class="flex items-center mb-3">
+                    <div class="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center mr-3">
+                      <i class="fas fa-book text-indigo-600"></i>
+                    </div>
+                    <h4 class="font-medium text-indigo-600">Verbos</h4>
+                  </div>
+                  
+                  <ul class="space-y-2 text-sm">
+                    <li class="flex items-center">
+                      <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                      Verbos regulares en presente
+                    </li>
+                    <li class="flex items-center">
+                      <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                      Verbos regulares en pasado
+                    </li>
+                    <li class="flex items-center">
+                      <i class="fas fa-lock text-gray-400 mr-2"></i>
+                      Verbos irregulares comunes
+                    </li>
+                  </ul>
+                </div>
+                
+                <!-- Reading Section -->
+                <div class="border border-green-100 rounded-lg p-4">
+                  <div class="flex items-center mb-3">
+                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                      <i class="fas fa-book-open text-green-600"></i>
+                    </div>
+                    <h4 class="font-medium text-green-600">Lectura</h4>
+                  </div>
+                  
+                  <ul class="space-y-2 text-sm">
+                    <li class="flex items-center">
+                      <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                      Textos nivel principiante
+                    </li>
+                    <li class="flex items-center">
+                      <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                      Textos nivel intermedio
+                    </li>
+                    <li class="flex items-center">
+                      <i class="fas fa-lock text-gray-400 mr-2"></i>
+                      Textos nivel avanzado
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            
+            <div class="bg-white p-6 rounded-xl shadow-sm">
+              <h3 class="text-lg font-bold mb-4">Vocabulario guardado</h3>
+              
+              <div class="space-y-4">
+                <div class="flex justify-between items-center mb-3">
+                  <p class="text-gray-600">45 palabras guardadas</p>
+                  <div class="flex space-x-2">
+                    <button class="text-xs bg-indigo-100 text-indigo-600 px-3 py-1 rounded-full">Todas</button>
+                    <button class="text-xs bg-gray-100 text-gray-600 px-3 py-1 rounded-full">Recientes</button>
+                    <button class="text-xs bg-gray-100 text-gray-600 px-3 py-1 rounded-full">Por tema</button>
+                  </div>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                  <div class="border rounded-lg p-3">
+                    <p class="font-medium">unprecedented</p>
+                    <p class="text-sm text-gray-600">Never done before</p>
+                  </div>
+                  
+                  <div class="border rounded-lg p-3">
+                    <p class="font-medium">embedded</p>
+                    <p class="text-sm text-gray-600">Fixed into surface</p>
+                  </div>
+                  
+                  <div class="border rounded-lg p-3">
+                    <p class="font-medium">autonomous</p>
+                    <p class="text-sm text-gray-600">Self-governing</p>
+                  </div>
+                  
+                  <div class="border rounded-lg p-3">
+                    <p class="font-medium">staggering</p>
+                    <p class="text-sm text-gray-600">Astonishing</p>
+                  </div>
+                  
+                  <div class="border rounded-lg p-3">
+                    <p class="font-medium">innovations</p>
+                    <p class="text-sm text-gray-600">New methods</p>
+                  </div>
+                  
+                  <div class="border rounded-lg p-3">
+                    <p class="font-medium">implications</p>
+                    <p class="text-sm text-gray-600">Conclusions</p>
+                  </div>
+                </div>
+                
+                <button class="w-full mt-2 border border-indigo-600 text-indigo-600 rounded-lg py-2 hover:bg-indigo-50 transition">
+                  Ver todas las palabras
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+      
+      <!-- Footer -->
+      <footer class="bg-gray-800 text-white py-6">
+        <div class="container mx-auto px-4">
+          <div class="flex flex-col md:flex-row justify-between items-center">
+            <div class="mb-4 md:mb-0">
+              <p>&copy; 2025 EnglishPro - Todos los derechos reservados</p>
+            </div>
+            <div class="flex space-x-4">
+              <a href="javascript:void(0)" class="text-white hover:text-indigo-300 transition">
+                <i class="fab fa-facebook-f"></i>
+              </a>
+              <a href="javascript:void(0)" class="text-white hover:text-indigo-300 transition">
+                <i class="fab fa-twitter"></i>
+              </a>
+              <a href="javascript:void(0)" class="text-white hover:text-indigo-300 transition">
+                <i class="fab fa-instagram"></i>
+              </a>
+              <a href="javascript:void(0)" class="text-white hover:text-indigo-300 transition">
+                <i class="fab fa-youtube"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </section>
+  </div>
+
+  <script id="app-script">
+    // Navigation between pages
+    function navigateTo(pageId) {
+      // Hide all pages
+      document.querySelectorAll('section').forEach(section => {
+        section.classList.add('hidden');
+      });
+      
+      // Show the selected page
+      document.getElementById(pageId).classList.remove('hidden');
+      
+      // Scroll to top
+      window.scrollTo(0, 0);
+    }
+    
+    // Tab functionality
+    document.querySelectorAll('.tab-button').forEach(button => {
+      button.addEventListener('click', () => {
+        // Remove active class from all tabs
+        document.querySelectorAll('.tab-button').forEach(btn => {
+          btn.classList.remove('tab-active');
+        });
+        
+        // Add active class to clicked tab
+        button.classList.add('tab-active');
+        
+        // Hide all tab content
+        document.querySelectorAll('.tab-content').forEach(content => {
+          content.classList.remove('active');
+        });
+        
+        // Show the selected tab content
+        const tabId = button.getAttribute('data-tab');
+        document.getElementById(tabId).classList.add('active');
+      });
+    });
+    
+    // Word modal functionality
+    function showWordModal(word) {
+      const modal = document.getElementById('word-modal');
+      modal.classList.add('active');
+      
+      // In a real app, we would fetch the word data from an API
+      document.getElementById('modal-word').textContent = word;
+      
+      // For the prototype, we'll just use placeholder data
+      const placeholders = {
+        unprecedented: {
+          pronunciation: "/ʌnˈpresɪdentɪd/",
+          definition: "Never done or known before; without previous example.",
+          example: "The internet brought unprecedented changes to how we communicate."
+        },
+        innovations: {
+          pronunciation: "/ˌɪnəˈveɪʃənz/",
+          definition: "New methods, ideas, or products.",
+          example: "The company is known for its technological innovations."
+        },
+        embedded: {
+          pronunciation: "/ɪmˈbedɪd/",
+          definition: "Fixed firmly and deeply in a surrounding mass.",
+          example: "AI is now embedded in many everyday devices."
+        },
+        autonomous: {
+          pronunciation: "/ɔːˈtɒnəməs/",
+          definition: "Having the freedom to act independently.",
+          example: "Self-driving cars are autonomous vehicles."
+        },
+        advent: {
+          pronunciation: "/ˈadvɛnt/",
+          definition: "The arrival of a notable person, thing, or event.",
+          example: "The advent of the internet changed the world."
+        },
+        revolutionized: {
+          pronunciation: "/ˌrɛvəˈluːʃənaɪzd/",
+          definition: "Changed something radically or fundamentally.",
+          example: "The smartphone revolutionized mobile communication."
+        },
+        staggering: {
+          pronunciation: "/ˈstæɡərɪŋ/",
+          definition: "Astonishing or overwhelming.",
+          example: "The cost of the project was staggering."
+        },
+        transforming: {
+          pronunciation: "/trænsˈfɔːmɪŋ/",
+          definition: "Making a thorough or dramatic change in form, appearance, or character.",
+          example: "Technology is transforming how we work."
+        },
+        immersive: {
+          pronunciation: "/ɪˈmɜːsɪv/",
+          definition: "Providing, involving, or characterized by deep absorption or immersion in something.",
+          example: "Virtual reality provides an immersive experience."
+        },
+        sophisticated: {
+          pronunciation: "/səˈfɪstɪkeɪtɪd/",
+          definition: "Highly developed and complex.",
+          example: "Modern smartphones are sophisticated devices."
+        },
+        implications: {
+          pronunciation: "/ˌɪmplɪˈkeɪʃənz/",
+          definition: "The conclusion that can be drawn from something although it is not explicitly stated.",
+          example: "We need to consider the ethical implications of AI."
+        }
+      };
+      
+      if (placeholders[word]) {
+        document.getElementById('modal-pronunciation').textContent = placeholders[word].pronunciation;
+        document.getElementById('modal-definition').textContent = placeholders[word].definition;
+        document.getElementById('modal-example').textContent = placeholders[word].example;
+      }
+    }
+    
+    function closeWordModal() {
+      const modal = document.getElementById('word-modal');
+      modal.classList.remove('active');
+    }
+    
+    // Close modal when clicking outside of it
+    document.getElementById('word-modal').addEventListener('click', function(event) {
+      if (event.target === this) {
+        closeWordModal();
+      }
+    });
+    
+    // Initialize local storage for user progress if not exists
+    if (!localStorage.getItem('userProgress')) {
+      localStorage.setItem('userProgress', JSON.stringify({
+        verbProgress: 35,
+        readingProgress: 45,
+        vocabProgress: 20,
+        savedWords: ['unprecedented', 'innovations', 'autonomous', 'embedded', 'staggering', 'implications']
+      }));
+    }
+  </script>
+</body>
+</html>
