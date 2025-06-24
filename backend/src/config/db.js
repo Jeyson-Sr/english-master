@@ -3,7 +3,7 @@
 import mysql from 'mysql2/promise';
 import 'dotenv/config'
 
-'dontenv/config'
+// 'dontenv/config'
 
 const pool = mysql.createPool({
   host: process.env.DB_HOST,

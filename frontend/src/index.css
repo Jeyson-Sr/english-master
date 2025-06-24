@@ -1,0 +1,103 @@
+@import "tailwindcss";
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #F8FAFC;
+    color: #1E293B;
+  }
+  
+  .app-container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .method-card {
+    transition: transform 0.3s ease;
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .method-card:hover {
+    transform: translateY(-5px);
+  }
+  
+  .verb-card {
+    background-color: #EEF2FF;
+    border-left: 4px solid #4F46E5;
+  }
+  
+  .reading-card {
+    background-color: #ECFDF5;
+    border-left: 4px solid #059669;
+  }
+  
+  .vocab-card {
+    background-color: #FEF2F2;
+    border-left: 4px solid #DC2626;
+  }
+  
+  .progress-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+  }
+  
+  .highlighted-word {
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    cursor: pointer;
+    color: #4F46E5;
+  }
+  
+  .tab-active {
+    border-bottom: 3px solid #4F46E5;
+    color: #4F46E5;
+    font-weight: 600;
+  }
+  
+  .slide-enter {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  
+  .slide-enter-active {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 300ms, transform 300ms;
+  }
+  
+  .tab-content {
+    display: none;
+  }
+  
+  .tab-content.active {
+    display: block;
+    animation: fadeIn 0.5s;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  .modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .modal.active {
+    display: flex;
+  }
